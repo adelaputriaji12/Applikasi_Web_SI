@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Daftar Mahasiswa - SI Peringatan Dini{% endblock %}
+
+{% block isi %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h3 class="fw-bold mb-1 text-dark">Data Akademik Mahasiswa</h3>
+        <p class="text-secondary mb-0">
+            Filter Prodi: 
+            <span class="badge bg-primary text-white">
+                {{ prodi_aktif | default('Semua Program Studi', true) | title }}
+            </span>
+            &bull; Ditemukan: <strong>{{ daftar_mahasiswa | length }}</strong> data
+            {% if prodi_aktif %}
+                <a href="{{ url_for('daftar_mahasiswa') }}" class="btn btn-sm btn-link text-decoration-none ms-2">
+                    <i class="bi bi-x-circle"></i> Reset Filter
+                </a>
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="d-flex gap-2 flex-wrap">
+        <!-- Tombol Tambah Mahasiswa Baru -->
+        <a href="{{ url_for('tambah_mahasiswa') }}" class="btn btn-success btn-sm shadow-sm">
+            <i class="bi bi-person-plus-fill me-1"></i> Tambah Mahasiswa
+        </a>
+
+        <!-- Filter Cepat Prodi -->
+        <div class="btn-group shadow-sm">
+            <a href="{{ url_for('daftar_mahasiswa') }}" class="btn btn-outline-secondary btn-sm {% if not prodi_aktif %}active{% endif %}">
+                Semua
+            </a>
+            {% for p in daftar_prodi | sort %}
+            <a href="{{ url_for('daftar_mahasiswa', prodi=p) }}" class="btn btn-outline-secondary btn-sm {% if prodi_aktif.lower() == p.lower() %}active{% endif %}">
+                {{ p }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">NIM</th>
+                        <th>Nama Lengkap</th>
+                        <th>Program Studi</th>
+                        <th>IPK</th>
+                        <th>Predikat</th>
+                        <th>Kehadiran</th>
+                        <th>Status EWS</th>
+                        <th class="text-center pe-3">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in daftar_mahasiswa %}
+                    <tr class="{% if m.is_berisiko %}table-danger-subtle{% endif %}">
+                        <td class="ps-3 fw-bold">{{ m.nim }}</td>
+                        <td>{{ m.nama | title }}</td>
+                        <td><span class="badge bg-secondary-subtle text-secondary">{{ m.prodi }}</span></td>
+                        <td><strong>{{ "%.2f"|format(m.ipk) }}</strong></td>
+                        <td><span class="small text-muted">{{ m.ipk | predikat }}</span></td>
+                        <td>{{ m.kehadiran | persen }}</td>
+                        <td>
+                            {% if m.is_berisiko %}
+                                <span class="badge badge-berisiko px-2 py-1">
+                                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Berisiko
+                                </span>
+                            {% else %}
+                                <span class="badge badge-aman px-2 py-1">
+                                    <i class="bi bi-shield-check me-1"></i> Aman
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center pe-3">
+                            <div class="d-inline-flex gap-1">
+                                <a href="{{ url_for('detail_mahasiswa', nim=m.nim) }}" class="btn btn-sm btn-primary" title="Lihat Profil & Catatan">
+                                    <i class="bi bi-person-badge"></i> Detail
+                                </a>
+                                <a href="{{ url_for('api_mahasiswa', nim=m.nim) }}" target="_blank" class="btn btn-sm btn-outline-dark" title="Lihat JSON API">
+                                    <i class="bi bi-code-slash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="bi bi-search fs-2 d-block mb-2 text-secondary"></i>
+                            <strong>Belum ada data mahasiswa di dalam database.</strong>
+                            <div class="mt-2">
+                                <a href="{{ url_for('tambah_mahasiswa') }}" class="btn btn-sm btn-primary">Tambah Mahasiswa Sekarang</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

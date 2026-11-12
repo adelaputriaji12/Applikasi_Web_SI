@@ -1,0 +1,41 @@
+{# Makro Jinja2 untuk me-render label, input field, dan pesan error validasi form #}
+{% macro render_field(field, placeholder="", class="") %}
+<div class="mb-3">
+    {# Tampilkan label jika bukan field tersembunyi / submit #}
+    {% if field.type not in ['HiddenField', 'CSRFTokenField', 'SubmitField'] %}
+        <label for="{{ field.id }}" class="form-label fw-semibold text-dark">
+            {{ field.label.text }}
+            {% if field.flags.required %}
+                <span class="text-danger" title="Wajib diisi">*</span>
+            {% endif %}
+        </label>
+    {% endif %}
+
+    {# Deteksi error untuk menambahkan class CSS is-invalid #}
+    {% if field.errors %}
+        {% set field_class = class ~ ' is-invalid' %}
+    {% else %}
+        {% set field_class = class %}
+    {% endif %}
+
+    {# Render elemen input sesuai tipenya #}
+    {% if field.type == 'SelectField' %}
+        {{ field(class="form-select " ~ field_class, **kwargs) }}
+    {% elif field.type == 'TextAreaField' %}
+        {{ field(class="form-control " ~ field_class, placeholder=placeholder, **kwargs) }}
+    {% elif field.type == 'SubmitField' %}
+        {{ field(class="btn btn-primary " ~ class, **kwargs) }}
+    {% else %}
+        {{ field(class="form-control " ~ field_class, placeholder=placeholder, **kwargs) }}
+    {% endif %}
+
+    {# Render pesan error validasi di bawah elemen input #}
+    {% if field.errors %}
+        {% for error in field.errors %}
+            <div class="invalid-feedback d-block">
+                <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endmacro %}

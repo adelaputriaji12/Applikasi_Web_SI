@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Form Pencarian (PRG) - SI Peringatan Dini{% endblock %}
+
+{% block isi %}
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white py-3">
+                <h5 class="fw-bold mb-0 text-primary">
+                    <i class="bi bi-search me-1"></i> Form Pencarian Mahasiswa
+                </h5>
+                <small class="text-muted">Arsitektur Pola Post / Redirect / Get (PRG)</small>
+            </div>
+            <div class="card-body p-4">
+                <!-- Form menggunakan metode POST menuju rute url_for('cari') -->
+                <form action="{{ url_for('cari') }}" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark">Pilih Kategori Pencarian</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="tipe" id="tipeProdi" value="prodi" checked>
+                            <label class="form-check-label" for="tipeProdi">
+                                Berdasarkan Program Studi (Filter Query String)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="tipe" id="tipeNim" value="nim">
+                            <label class="form-check-label" for="tipeNim">
+                                Berdasarkan Nomor Induk Mahasiswa / NIM (Variabel URL)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="keyword" class="form-label fw-semibold text-dark">Kata Kunci Pencarian</label>
+                        <input type="text" class="form-control form-control-lg" id="keyword" name="keyword" 
+                               placeholder="Contoh: Sistem Informasi atau 21001" required>
+                        <div class="form-text mt-2">
+                            Program Studi tersedia (Total: {{ daftar_prodi | length }}):
+                            <div class="mt-1 d-flex flex-wrap gap-1">
+                                {# Penggunaan for-else dan filter bawaan: sort, title #}
+                                {% for p in daftar_prodi | sort %}
+                                    <span class="badge bg-secondary-subtle text-secondary">{{ p | title }}</span>
+                                {% else %}
+                                    <span class="text-muted small">Tidak ada opsi prodi.</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                            <i class="bi bi-arrow-right-circle me-1"></i> Kirim Form & Redirect
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer bg-light p-3 small text-muted">
+                <i class="bi bi-shield-check text-primary me-1"></i>
+                <strong>Mengapa PRG (Post/Redirect/Get)?</strong>
+                Ketika form di-submit via HTTP POST ke <code>/cari</code>, server memproses data lalu mengirim respons redirect (HTTP 302) ke rute GET tujuan. Hal ini menjamin pengguna tidak akan secara tidak sengaja mengirim ulang data ganda (*double submit*) saat me-refresh browser.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
