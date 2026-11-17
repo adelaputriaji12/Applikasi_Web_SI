@@ -178,6 +178,20 @@ class TestSIPeringatanDini(unittest.TestCase):
         self.assertEqual(resp_prodi.status_code, 200)
         self.assertIn("Ahmad Fauzi", resp_prodi.get_data(as_text=True))
 
+    def test_halaman_anggota_tim(self):
+        """Memastikan halaman anggota tim dapat dibuka dan memuat nama serta NIM."""
+        response = self.client.get("/tim")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertIn("Anggota Tim", html)
+        self.assertIn("Adela Putri Aji", html)
+        self.assertIn("24.01.55.0012", html)
+        self.assertIn("Daffa Iqbal Maulana", html)
+        self.assertIn("24.01.55.14", html)
+        self.assertIn("Kaisya Audia Viera", html)
+        self.assertIn("24.01.55.0015", html)
+
     def test_api_json_respons(self):
         """Memastikan API JSON mengembalikan data mahasiswa dan list catatan."""
         response = self.client.get("/api/mahasiswa/A11.2023.00001")
