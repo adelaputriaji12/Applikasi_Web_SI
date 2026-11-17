@@ -126,6 +126,12 @@ def index():
     )
 
 
+# Rute halaman anggota tim
+@app.route("/tim")
+def anggota_tim():
+    return render_template("tim.html")
+
+
 # Rute 2: Query String (/mahasiswa?prodi=...)
 @app.route("/mahasiswa")
 def daftar_mahasiswa():
